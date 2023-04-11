@@ -1,4 +1,11 @@
 .ipynb_checkpoints
 .idea
 face_mask_detector
-
+image_data.npy
+x.npy
+y.npy
+X_train.npy
+X_test.npy
+y_test.npy
+y_train.npy
+model2
