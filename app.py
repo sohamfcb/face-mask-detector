@@ -1,6 +1,11 @@
 from keras.models import load_model
 import cv2
 
+haar = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_frontalface_default.xml")
+def detect_face(img):
+    coods=haar.detectMultiScale(img)
+    return coods
+
 def detect_mask_from_image(img):
     y_pred=model.predict(img.reshape(1,224,224,3))
     y_pred=[0 if x < 0.5 else 1 for x in y_pred]
@@ -30,15 +35,25 @@ if __name__=="__main__":
     cap = cv2.VideoCapture(0)
 
     while True:
-        ret, frame = cap.read()
+        _, frame = cap.read()
         frame = cv2.resize(frame, (224, 224))
+        labels = []
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        faces = haar.detectMultiScale(gray)
+
+        for (x, y, w, h) in faces:
+            cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 255), 2)
+            roi_gray = gray[y:y + h, x:x + w]
+
         y_pred = face_mask_detector(frame)
 
         if y_pred[0] == 0:
             draw_label(frame, 'Mask Detected', (30, 30), (0, 255, 0))
         else:
             draw_label(frame, 'No Mask', (30, 30), (0, 0, 255))
+
         cv2.imshow('window', frame)
+
         if cv2.waitKey(1) & 0xFF == ord('x'):
             break
 
